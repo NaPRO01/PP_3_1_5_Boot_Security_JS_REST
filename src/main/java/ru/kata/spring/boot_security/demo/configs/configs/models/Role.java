@@ -8,16 +8,6 @@ import java.util.Set;
 @Entity
 @Table(name = "roles")
 public class Role implements GrantedAuthority {
-    public Role(String roleUser) {
-    }
-
-    public Role() {
-    }
-
-    @Override
-    public String getAuthority() {
-        return null;
-    }
 
     @Id
     @Column(name = "id")
@@ -27,6 +17,17 @@ public class Role implements GrantedAuthority {
     @Transient
     @ManyToMany(mappedBy = "roles")
     private Set<User> users;
+
+    public Role() {
+    }
+
+    public Role(String roleUser) {
+    }
+
+    public Role(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public Long getId() {
         return id;
@@ -52,9 +53,9 @@ public class Role implements GrantedAuthority {
         this.users = users;
     }
 
-    public Role(Long id, String name) {
-        this.id = id;
-        this.name = name;
+    @Override
+    public String getAuthority() {
+        return name;
     }
 
     @Override

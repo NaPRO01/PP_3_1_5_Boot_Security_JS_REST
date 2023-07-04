@@ -10,16 +10,12 @@
 <br>
 
 <form th:method="POST" th:action="@{/admin/}" th:object="${user}">
-    <label for="name"> Name:</label>
-    <input type="text" th:field="*{name}" id="name"/>
+    <label for="username"> Username:</label>
+    <input type="text" th:field="*{username}" id="username"/>
     <br>
     <br>
     <label for="lastName"> Lastname:</label>
     <input type="text" th:field="*{lastName}" id="lastName"/>
-    <br>
-    <br>
-    <label for="username"> Username:</label>
-    <input type="text" th:field="*{username}" id="username"/>
     <br>
     <br>
     <label for="password"> Password:</label>

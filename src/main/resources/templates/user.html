@@ -9,16 +9,14 @@
 <table border="1px">
     <thead>
     <tr>
-        <th scope="col">Name</th>
-        <th scope="col">LastName</th>
         <th scope="col">Username</th>
+        <th scope="col">LastName</th>
     </tr>
     </thead>
     <tbody>
     <tr th:object="${user}">
-        <td><h1 th:text="${user.getName()} "></h1></td>
+        <td><h1 th:text="${user.getUsername()} "></h1></td>
         <td><h1 th:text="${user.getLastName()}"></h1></td>
-        <td><h1 th:text="${user.getUsername()}"></h1></td>
     </tr>
     </tbody>
 </table>

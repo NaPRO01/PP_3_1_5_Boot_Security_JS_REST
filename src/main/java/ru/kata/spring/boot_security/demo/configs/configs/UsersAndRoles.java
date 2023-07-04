@@ -32,8 +32,8 @@ public class UsersAndRoles implements CommandLineRunner {
         Set<Role> userSet = Stream.of(userTest).collect(Collectors.toSet());
         Set<Role> adminSet = Stream.of(adminTest).collect(Collectors.toSet());
 
-        User user = new User("User", "User", "user", "user", userSet);
-        User admin = new User("Admin", "Admin", "admin", "admin", adminSet);
+        User user = new User("User", "User", "user", userSet);
+        User admin = new User("Admin", "Admin", "admin", adminSet);
         userServiceImpl.add(user);
         userServiceImpl.add(admin);
 
