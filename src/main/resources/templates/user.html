@@ -1,43 +1,106 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:security="">
 <head>
     <meta charset="UTF-8">
 
-    <!-- Bootstrap CSS -->
-    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">-->
-
     <title>User Page</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
 </head>
 <body>
 
-<table border="1px">
-    <thead>
-    <tr>
-        <th scope="col">Username</th>
-        <th scope="col">LastName</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:object="${user}">
-        <td><h1 th:text="${user.getUsername()} "></h1></td>
-        <td><h1 th:text="${user.getLastName()}"></h1></td>
-    </tr>
-    </tbody>
-</table>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <h5 class="navbar-brand" th:text="${user.getUsername()} + ' with roles: ' + ${user.getRoles()}" />
+        <a href="/logout">
+            <button type="button" class="btn btn-secondary">Logout</button>
+        </a>
+    </div>
+</nav>
 
-<input align="right" type="button" value="logout"
-       onclick="window.location.href = '/logout'"/>
+<div class="row no-gutters ">
+    <nav id="sidebarMenu" class="col-md-2 col-lg-2 d-md-block sidebar collapse">
+        <div class="position-sticky pt-2">
+            <div sec:authorize="hasRole('ROLE_ADMIN')">
+                <ul class="nav nav-pills flex-column">
+                    <security:authorize access="hasRole('ROLE_ADMIN')">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/admin/">Admin</a>
+                        </li>
+                    </security:authorize>
+                </ul>
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/user">User</a>
+                    </li>
+                </ul>
+            </div>
+            <div sec:authorize="hasRole('ROLE_USER')">
+                <ul class="nav nav-pills flex-column">
+                    <security:authorize access="hasRole('ROLE_USER')">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/user">User</a>
+                        </li>
+                    </security:authorize>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
+    <div class="col-md-10 bg-light">
+        <div class="tab-content">
+            <div class="container-fluid">
+                <h1>User information-page</h1>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-users" role="tabpanel"
+                         aria-labelledby="nav-home-tab">
+                        <div class="panel panel-default active">
+                            <div class="panel-body">
+                                <table class="table table-striped" id="userTable">
+                                    <thead>
+                                    <tr>
+                                        <th class="panel-heading h5">About user</th>
+                                    </tr>
+                                    </thead>
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Username</th>
+                                        <th scope="col">Last Name</th>
+                                        <th scope="col">Role</th>
+                                    </tr>
 
-<!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                                    <tbody>
+                                    <tr>
+                                        <td th:text="${user.getId()}"></td>
+                                        <td th:text="${user.getUsername()}"></td>
+                                        <td th:text="${user.getLastName()}"></td>
+                                        <td>
+                                            <div th:each="role : ${user.getRoles()}">
+                                                <p id="role_field" th:text="${role.name.substring(5).toString()}"></p>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tbody id="data"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>-->
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </body>
 </html>
