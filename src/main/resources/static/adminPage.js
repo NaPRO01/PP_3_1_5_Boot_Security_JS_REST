@@ -1,194 +1,220 @@
-let URL = "http://localhost:8080/api/users";
-const roleURL = 'http://localhost:8080/api/roles';
+const url = 'http://localhost:8080/api/admin';
+const userUrl = 'http://localhost:8080/api/current_user';
 
-const selectRoleForm = document.getElementById('roles');
+document.addEventListener("DOMContentLoaded", async function () {
+    const authUser = await getAuthUser();
+    console.log(authUser);
+    await fillHeaderText(authUser);
+})
 
-fetch(roleURL)
-    .then(res => res.json())
-    .then(data => {
-        console.log(data)
-        let options = '';
-        for (const [key, value] of Object.entries(data)) {
-            options += `<option value="${Number(key) + 1}">${value.name}</option>`;
-        }
-        selectRoleForm.innerHTML = options;
-        console.log(options)
+function getAllUsers() {
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            loadTable(data)
+        })
+}
+
+function getAdminPage() {
+    fetch(url).then(response => response.json()).then(user => {
+        console.log(user);
+        loadTable(user)
     })
+}
 
+function loadTable(listAllUsers) {
+    let res = '';
+    for (let user of listAllUsers) {
+        res +=
+            `<tr>
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.lastName}</td>
+                <td id=${'role' + user.id}>${user.roles.map(r => r.name.substring(5, r.length)).join(' ')}</td>
+                <td>
+                    <button class="btn btn-info" type="button"
+                    data-bs-toggle="modal" data-bs-target="#editModal"
+                    onclick="editModal(${user.id})">Edit</button></td>
+                <td>
+                    <button class="btn btn-danger" type="button"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    onclick="deleteModal(${user.id})">Delete</button></td>
+            </tr>`
+    }
+    document.getElementById('tableBodyAdmin').innerHTML = res;
+}
 
-const userTable = document.getElementById('body-list');
-let outputUser = '';
-let roleLet;
+function getInformationAboutUser(user) {
+    console.log(user);
 
-const renderTable = (users) => {
-    users.forEach(user => {
-        roleLet = '';
-        user.role.forEach((role) => roleLet += role.name + " ");
-        outputUser += `
-        <tr>
-            <th><p>${user.id} </p></th>
-            <th><p>${user.username} </p></th>
-            <th><p>${user.lastName} </p></th>
-            <th><p>${roleLet.slice(0, roleLet.length - 3)} </p></th>
-            <th>
-                <button data-id="${user.id}" type="button" class="btn btn-primary" data-toggle="modal"
-                            data-target="#editModal" id="editbtn">Edit</button>
-            </th>
-            <th>
-                <button data-id="${user.id}" type="button" class="btn btn-danger " data-toggle="modal"
-                            data-target="#deleteModal" id="delbtn">Delete</button>
-            </th>
-        </tr>
-        `;
-    });
-    userTable.innerHTML = outputUser;
+    let result = '';
+    result =
+        `<tr>
+    <td>${user.id}</td>
+    <td>${user.username}</td>
+    <td>${user.lastName}</td>
+    <td id=${'role' + user.id}>${user.roles.map(r => r.name.substring(5, r.length)).join(' ')}</td>
+</tr>`
+    document.getElementById('userTableBody').innerHTML = result;
+}
+
+function getUserPage() {
+    fetch(userUrl).then(response => response.json()).then(user =>
+        getInformationAboutUser(user))
 }
 
 
-fetch(URL)
-    .then(res => res.json())
-    .then(data => renderTable(data))
+getAdminPage();
+getUserPage();
 
-let usernameField = document.querySelector(".username__input");
-let lastNameField = document.querySelector(".surname__input");
-let passwordField = document.querySelector(".password__input");
-let roleById = document.getElementById("roles");
 
-const userFormNew = document.getElementById('user_form_new');
-
-userFormNew.addEventListener('submit', (e) => {
-    const roles = [];
-    for (let i = 0; i < roleById.options.length; i++) {
-        if (roleById.options[i].selected) {
-            roles.push({
-                id: roleById.options[i].value,
-                name: roleById.options[i].text
-            });
+// Добавление пользователя
+document.getElementById('newUserForm').addEventListener('submit', (e) => {
+    e.preventDefault()
+    let role = document.getElementById('role_select')
+    let rolesAddUser = []
+    let rolesAddUserValue = ''
+    for (let i = 0; i < role.options.length; i++) {
+        if (role.options[i].selected) {
+            rolesAddUser.push({id: role.options[i].value, name: 'ROLE_' + role.options[i].innerHTML})
+            rolesAddUserValue += role.options[i].innerHTML
         }
     }
-    console.log(roles)
-    const user = {
-        username: usernameField.value,
-        lastName: lastNameField.value,
-        password: passwordField.value,
-        role: roles
-    }
-    fetch(`${URL}`, {
-        method: 'post',
+    fetch(url, {
+        method: 'POST',
         headers: {
-            'Content-type': 'application/json',
+            'Content-Type': 'application/json;charset=utf-8'
         },
-        body: JSON.stringify(user),
-    })
-        .then(res => res.json())
-        .then(data => {
-            const dataArr = []
-            dataArr.push(data)
-            renderTable(dataArr)
-            userFormNew.reset()
-            $('[href="#users_table"]').tab('show')
+        body: JSON.stringify({
+            username: document.getElementById('newUsername').value,
+            lastName: document.getElementById('newLastName').value,
+            password: document.getElementById('newPassword').value,
+            roles: rolesAddUser
         })
-        .catch(err => console.error(err));
-});
-
-
-userTable.addEventListener('click', (e) => {
-    e.preventDefault()
-    if (e.target.id === 'delbtn') {
-        fetch(`${URL}/${e.target.dataset.id}`)
-            .then(res => res.json())
-            .then(data => {
-                let roles = '';
-                data.role.forEach(role => roles += role.name + "  ")
-                document.querySelector("#idDel").value = data.id
-                document.querySelector("#usernameDel").value = data.username
-                document.querySelector("#lastnameDel").value = data.lastName
-                document.querySelector("#roles_delete").value = roles
-                console.log(roles)
-                }
-            )
-    } else if (e.target.id === 'editbtn') {
-        fetch(`${URL}/${e.target.dataset.id}`)
-            .then(res => res.json())
-            .then(data => {
-                document.querySelector("#idEdit").value = data.id
-                document.querySelector("#usernameEdit").value = data.username
-                document.querySelector("#lastnameEdit").value = data.lastName
-                fetch(roleURL)
-                    .then(res => res.json())
-                    .then(rolesData => {
-                        let options = '';
-                        for (const [id, name] of Object.entries(rolesData)) {
-                            const selected = data.role.some(role => role.id === id) ? 'selected' : '';
-                            options += `<option value="${Number(id) + 1}" ${selected}>${name.name}</option>`;
-                        }
-                        $('#roles_edit').html(options);
-                        $('#editModal').modal()
-                    })
-                    .catch(err => console.error(err));
-            });
-    }
-})
-
-
-let modalFormDelete = document.querySelector('#modal__form__delete');
-
-modalFormDelete.addEventListener('submit', (e) => {
-    let userId = document.querySelector("#idDel").value
-
-    fetch(`${URL}/${userId}`, {
-        method: "delete"
     })
-        .then(res => console.log(res))
-        .then(() => {
-            outputUser = ''
-        })
-    fetch(URL)
-        .then(res => console.log(res))
-        .then(() => {
-            outputUser = ''
-            fetch(URL)
-                .then(res => res.json())
-                .then(data => renderTable(data))
+        .then((response) => {
+            if (response.ok) {
+                getAllUsers()
+                document.getElementById("all-users-tab").click()
+            }
         })
 })
 
 
-let modalFormEdit = document.querySelector('#editModalForm');
-let roleEdit = document.querySelector('#roles_edit')
+// Закрытие модального окна
+function closeModal() {
+    // document.getElementById("editClose").click()
+    document.querySelectorAll(".btn-close").forEach((btn) => btn.click())
+}
 
-modalFormEdit.addEventListener('submit', (e) => {
-    e.preventDefault()
-    const rol = [];
-    for (let i = 1; i < roleEdit.options.length + 1; i++) {
-        if (roleEdit.options[i - 1].selected) {
-            rol.push({
-                id: roleEdit.options[i - 1].value,
-                name: roleEdit.options[i - 1].text
-            });
+
+//Редактирование пользователя
+function editModal(id) {
+    fetch(url + '/' + id, {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8'
+        }
+    }).then(res => {
+        res.json().then(u => {
+
+            document.getElementById('editId').value = u.id;
+            document.getElementById('editUsername').value = u.username;
+            document.getElementById('editLastName').value = u.lastName;
+            document.getElementById('editPassword').value = "****";
+
+        })
+    });
+}
+
+
+async function editUser() {
+    const form_ed = document.getElementById('modalEdit');
+    let idValue = document.getElementById("editId").value;
+    let username = document.getElementById("editUsername").value;
+    let lastNameValue = document.getElementById("editLastName").value;
+    let passwordValue = document.getElementById("editPassword").value;
+    let listOfRole = [];
+    for (let i = 0; i < form_ed.roles.options.length; i++) {
+        if (form_ed.roles.options[i].selected) {
+            let tmp = {};
+            tmp["id"] = form_ed.roles.options[i].value
+            listOfRole.push(tmp);
+            console.log(listOfRole);
         }
     }
-    console.log(rol)
-    const user = {
-        id: document.querySelector("#idEdit").value,
-        username: document.querySelector("#usernameEdit").value,
-        lastName: document.querySelector("#lastnameEdit").value,
-        password: passwordField.value,
-        role: rol
+    let user = {
+        id: idValue,
+        username: username,
+        lastName: lastNameValue,
+        password: passwordValue,
+        roles: listOfRole
     }
-    fetch(`${URL}`, {
-        method: 'put',
+    await fetch(url + '/' + user.id, {
+        method: "PATCH",
         headers: {
-            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8'
         },
-        body: JSON.stringify(user),
-    })
-        .then(res => console.log(res))
-        .then(() => {
-            $('#editModal').modal('hide')
-            outputUser = ''
-            fetch(URL)
-                .then(res => res.json())
-                .then(data => renderTable(data))
+        body: JSON.stringify(user)
+    });
+    closeModal()
+    getAllUsers()
+}
+
+
+// Удаление пользователя
+function deleteModal(id) {
+    fetch(url + '/' + id, {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8'
+        }
+    }).then(res => {
+        res.json().then(u => {
+            console.log(u);
+            document.getElementById('deleteId').value = u.id;
+            document.getElementById('deleteUsername').value = u.username;
+            document.getElementById('deleteLastName').value = u.lastName;
+            document.getElementById("deleteRole").value = u.roles.map(r => r.name).join(", ");
         })
-})
+    });
+}
+
+async function deleteUser() {
+    const id = document.getElementById("deleteId").value
+    console.log(id)
+    let urlDel = url + "/" + id;
+    let method = {
+        method: 'DELETE',
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }
+
+    fetch(urlDel, method).then(() => {
+        closeModal()
+        getAllUsers()
+    })
+
+}
+
+async function fillHeaderText(authUser) {
+    document.getElementById("header_text").innerText =
+        `${authUser['username']} with roles: ${getUserRole(authUser['roles'])}`
+}
+
+function getUserRole(roles) {
+    let result = "";
+    for (const role of roles) {
+        result += role["name"].replace('ROLE_', '') + " ";
+    }
+    console.log(result);
+    return result;
+}
+
+async function getAuthUser() {
+    const response = await fetch(`http://localhost:8080/api/current_user`);
+    const authUser = await response.json();
+    return authUser;
+}

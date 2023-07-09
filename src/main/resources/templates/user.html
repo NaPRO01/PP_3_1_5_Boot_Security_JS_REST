@@ -1,93 +1,75 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="https://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 
-    <title>User Page</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+    <title>User</title>
 </head>
-<body>
 
+<body>
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
-        <h5 class="navbar-brand" th:text="${user.getUsername()} + ' with roles: ' + ${user.getRoles()}">User</h5>
-        <a href="/logout">
-            <button type="button" class="btn btn-secondary">Logout</button>
-        </a>
+        <span class="navbar-brand mb-0 h1" id="header_text">
+        </span>
+        <a class="nav-link active" aria-current="page" href="/logout">Logout</a>
     </div>
 </nav>
 
 <div class="container-fluid">
     <div class="row">
-
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3">
-                <ul class="nav nav-pills flex-column">
-                    <li style="display: block" id="btn_admin" class="nav-item">
-                        <a class="nav-link " aria-current="page" href="/admin">
-                            Admin
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active " href="/user">
-                            User
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-
-        <main class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">User Information-page</h1>
-            </div>
-            <div>
-                <h2>About user</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>id</th>
-                                <th>Username</th>
-                                <th>Last Name</th>
-                                <th>Role</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th><p th:text="${user.getId()}"></p></th>
-                                <th><p th:text="${user.getUsername()}"></p></th>
-                                <th><p th:text="${user.getLastName()}"></p></th>
-                                <th>
-                                    <div th:each="role : ${user.getRoles()}">
-                                        <p id="role_field" th:text="${role.name.toString()}"></p>
-                                    </div>
-                                </th>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="d-flex align-items-start">
+            <div class="col-md-2">
+                <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <button class="nav-link active"
+                            id="v-pills-user-tab"
+                            data-bs-toggle="pill"
+                            data-bs-target="#v-pills-user"
+                            type="button" role="tab"
+                            aria-controls="v-pills-user"
+                            aria-selected="false"
+                    >User
+                    </button>
                 </div>
             </div>
-        </main>
+            <div class="col-md-10">
+                <div class="tab-pane"
+                     id="v-pills-user"
+                     role="tabpanel"
+                     aria-labelledby="v-pills-user-tab"
+                     tabindex="0">
+                    <div>
+                        <h5>User information-page</h5>
+                    </div>
+                    <div class="container-fluid">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Last Name</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
 
-
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.bundle.min.js"></script>
-<script>
-    if (document.getElementById("role_field").textContent.includes("ROLE_ADMIN")) {
-        document.getElementById("btn_admin").style.display = "block"
-    } else {
-        document.getElementById("btn_admin").style.display = "none"
-    }
-</script>
-<script src="../static/adminPage.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script type="text/javascript" src="../static/user.js"></script>
 
 </body>
 </html>
