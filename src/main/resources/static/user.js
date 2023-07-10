@@ -1,5 +1,3 @@
-const userUrl = 'http://localhost:8080/api/current_user';
-
 document.addEventListener("DOMContentLoaded", async function () {
     const authUser = await getAuthUser();
     console.log(authUser);
@@ -7,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 })
 
 function getUserPage() {
-    fetch(userUrl).then(response => response.json()).then(user =>
+    fetch('/api/current_user').then(response => response.json()).then(user =>
         getInformationAboutUser(user))
 }
 
@@ -43,7 +41,7 @@ function getUserRole(roles) {
 }
 
 async function getAuthUser() {
-    const response = await fetch(`http://localhost:8080/api/current_user`);
+    const response = await fetch(`/api/current_user`);
     const authUser = await response.json();
     return authUser;
 }

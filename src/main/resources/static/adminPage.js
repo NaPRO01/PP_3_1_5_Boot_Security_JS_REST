@@ -1,6 +1,3 @@
-const url = 'http://localhost:8080/api/admin';
-const userUrl = 'http://localhost:8080/api/current_user';
-
 document.addEventListener("DOMContentLoaded", async function () {
     const authUser = await getAuthUser();
     console.log(authUser);
@@ -8,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 })
 
 function getAllUsers() {
-    fetch(url)
+    fetch('/api/admin')
         .then(res => res.json())
         .then(data => {
             loadTable(data)
@@ -16,7 +13,7 @@ function getAllUsers() {
 }
 
 function getAdminPage() {
-    fetch(url).then(response => response.json()).then(user => {
+    fetch('/api/admin').then(response => response.json()).then(user => {
         console.log(user);
         loadTable(user)
     })
@@ -59,7 +56,7 @@ function getInformationAboutUser(user) {
 }
 
 function getUserPage() {
-    fetch(userUrl).then(response => response.json()).then(user =>
+    fetch('/api/current_user').then(response => response.json()).then(user =>
         getInformationAboutUser(user))
 }
 
@@ -68,7 +65,7 @@ getAdminPage();
 getUserPage();
 
 
-// Добавление пользователя
+//Добавление пользователя
 document.getElementById('newUserForm').addEventListener('submit', (e) => {
     e.preventDefault()
     let role = document.getElementById('role_select')
@@ -80,7 +77,7 @@ document.getElementById('newUserForm').addEventListener('submit', (e) => {
             rolesAddUserValue += role.options[i].innerHTML
         }
     }
-    fetch(url, {
+    fetch('/api/admin', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
@@ -95,22 +92,26 @@ document.getElementById('newUserForm').addEventListener('submit', (e) => {
         .then((response) => {
             if (response.ok) {
                 getAllUsers()
-                document.getElementById("all-users-tab").click()
+                document.getElementById("all-users-tab").click();
+                document.getElementById('newUsername').value="";
+                document.getElementById('newLastName').value="";
+                document.getElementById('newPassword').value="";
+                document.getElementById('role_select').value="";
             }
         })
 })
 
 
+
 // Закрытие модального окна
 function closeModal() {
-    // document.getElementById("editClose").click()
     document.querySelectorAll(".btn-close").forEach((btn) => btn.click())
 }
 
 
 //Редактирование пользователя
 function editModal(id) {
-    fetch(url + '/' + id, {
+    fetch('/api/admin' + '/' + id, {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json;charset=UTF-8'
@@ -150,7 +151,7 @@ async function editUser() {
         password: passwordValue,
         roles: listOfRole
     }
-    await fetch(url + '/' + user.id, {
+    await fetch('/api/admin' + '/' + user.id, {
         method: "PATCH",
         headers: {
             'Accept': 'application/json',
@@ -165,7 +166,7 @@ async function editUser() {
 
 // Удаление пользователя
 function deleteModal(id) {
-    fetch(url + '/' + id, {
+    fetch('/api/admin' + '/' + id, {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json;charset=UTF-8'
@@ -184,7 +185,7 @@ function deleteModal(id) {
 async function deleteUser() {
     const id = document.getElementById("deleteId").value
     console.log(id)
-    let urlDel = url + "/" + id;
+    let urlDel = '/api/admin' + "/" + id;
     let method = {
         method: 'DELETE',
         headers: {
